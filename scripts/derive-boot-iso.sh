@@ -34,13 +34,73 @@ add_payload() {
   # Add squashfs
   cp $SQUASHFS $DST
   cat > interactive-defaults.ks <<EOK
-timezone --utc Etc/UTC
 
+
+auth --enableshadow --passalgo=sha512
+#lang en_US.UTF-8
+lang zh_CN.UTF-8
+keyboard us
+rootpw --iscrypted \$6\$i4SoOADixGL2n8Mz\$kcgo2q3drqGnCNz/2cIbLpYHAIXiEXfdbwgW1PA4Wp0nmhSscJ5S3I/0MTQEXoiYKxNwfjnuOkzh83xrgjkkh0
+selinux --disabled
+network
+services --enabled=sshd
+timezone Asia/Shanghai --isUtc --nontp
+#timezone --utc Etc/UTC
+user --name=tom --password=\$6\$mnWECRTnWSxq5FSj\$MbKmLEx5u8VEEntIt7zH/i8O/nUnXHy/ffvoglQir0whVNwT1qI5uj66Vd2RWPQzXIInhwJTnqzzc5MJ2N8cM/ --iscrypted --gecos="tom"
+firstboot --disabled
+# Partition clearing information
+bootloader --append="crashkernel=auto"
+#zerombr
+#clearpart --all --initlabel
+#autopart --type=lvm
+autopart --type=thinp
 liveimg --url=file:///run/install/repo/$DST
+#poweroff
 
 %post --erroronfail
 imgbase layout --init
+#set -x
+rm -fr /var/lib/pgsql/data/log/
+echo "LANG=en_US.UTF-8" > /etc/locale.conf
+
+#echo "Creating a partial answer file"
+cat > /root/ovirt-4.4-engine-answers <<__EOF__
+[environment:default]
+OVESETUP_CORE/engineStop=none:None
+OVESETUP_DIALOG/confirmSettings=bool:True
+OVESETUP_DB/database=str:engine
+OVESETUP_DB/fixDbViolations=none:None
+OVESETUP_DB/secured=bool:False
+OVESETUP_DB/securedHostValidation=bool:False
+OVESETUP_DB/host=str:localhost
+OVESETUP_DB/user=str:engine
+OVESETUP_DB/port=int:5432
+OVESETUP_DWH_CORE/enable=bool:True
+OVESETUP_DWH_CONFIG/dwhDbBackupDir=str:/var/lib/ovirt-engine-dwh/backups
+OVESETUP_DWH_PROVISIONING/postgresProvisioningEnabled=bool:True
+OVESETUP_DWH_DB/secured=bool:False
+OVESETUP_DWH_DB/host=str:localhost
+OVESETUP_ENGINE_CORE/enable=bool:True
+OVESETUP_SYSTEM/nfsConfigEnabled=bool:False
+OVESETUP_SYSTEM/memCheckEnabled=bool:False
+OVESETUP_CONFIG/applicationMode=str:both
+OVESETUP_CONFIG/firewallManager=str:firewalld
+OVESETUP_CONFIG/storageType=str:nfs
+OVESETUP_CONFIG/sanWipeAfterDelete=bool:False
+OVESETUP_CONFIG/updateFirewall=bool:True
+OVESETUP_CONFIG/websocketProxyConfig=bool:True
+OVESETUP_PROVISIONING/postgresProvisioningEnabled=bool:True
+OVESETUP_VMCONSOLE_PROXY_CONFIG/vmconsoleProxyConfig=bool:True
+OVESETUP_APACHE/configureRootRedirection=bool:True
+OVESETUP_APACHE/configureSsl=bool:True
+OSETUP_RPMDISTRO/requireRollback=none:None
+OSETUP_RPMDISTRO/enableUpgrade=none:None
+QUESTION/1/OVESETUP_IGNORE_SNAPSHOTS_WITH_OLD_COMPAT_LEVEL=str:yes
+OVESETUP_GRAFANA_CORE/enable=bool:False
+__EOF__
+
 %end
+
 EOK
   # Add branding
   local os_release=$(mktemp -p /var/tmp)

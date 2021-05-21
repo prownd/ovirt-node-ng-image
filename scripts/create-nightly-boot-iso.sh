@@ -2,7 +2,8 @@
 
 BRANCH=${BRANCH:-master}
 DISTRO=$(rpm --eval '%{dist}'|cut -d. -f2)
-NEWISO=${1:-$(realpath .)/ovirt-node-ng-installer-${VERSION}-$(date +%Y%m%d%H).${DISTRO}.iso}
+#NEWISO=${1:-$(realpath .)/ovirt-node-ng-installer-${VERSION}-$(date +%Y%m%d%H).${DISTRO}.iso}
+NEWISO=${1:-$(realpath .)/ovirt-installer-allinone-${VERSION}-$(date +%Y%m%d%H).${DISTRO}.iso}
 BOOTISO=${BOOTISO:-boot.iso}
 SQUASHFS=${SQUASHFS:-ovirt-node-ng-image.squashfs.img}
 PRODUCTIMG=${PRODUCTIMG:-product.img}

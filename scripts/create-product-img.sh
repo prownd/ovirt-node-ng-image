@@ -40,9 +40,11 @@ fi
 # ks: kargs
 #cp "$KSFILE" "$KSDIR"/interactive-defaults.ks
 
+#Product=SuperRed oVirt Node
+#Product=oVirt Node Next
 cat > "$PRDDIR/.buildstamp" <<EOF
 [Main]
-Product=oVirt Node Next
+Product=SuperRed oVirt
 Version=${VERSION}
 BugURL=https://bugzilla.redhat.com
 IsFinal=${ISFINAL}
